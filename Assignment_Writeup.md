@@ -3,12 +3,57 @@
 Steps for my analysis
 1. As the data had too many variables and many columns consisted of mainly NA/DIV/0 columns so I read the files by replacing all the blanks/NAs/Nan/DIV/0! by NA
 2. Next I reduced the number of columns by keeping columns which had only full rows of data and ignoring the NAs
+
+## Train_pml<-read.csv("C:/DATA SCIENCE SPECIALIZATION/pml-training.csv",header = TRUE,
+##                    na.strings = c("NA","NaN","","#DIV/0!"))
+## test_pml<-read.csv("C:/DATA SCIENCE SPECIALIZATION/pml-testing.csv",header = TRUE,
+##                   na.strings = c("NA","NaN","","#DIV/0!"))
+## summary(Train_pml)
+## Train_pml2<-Train_pml[,sapply(Train_pml,function(x) !any(is.na(x)))]
+## test_pml2<-test_pml[,sapply(test_pml,function(x) !any(is.na(x)))]
+
+
 3. I had around 60 columns now including the names/row numbers/TimeStamps
 4. I reduced the number of predictors further by doing a PCA on the data excluding the Classe variable.
+
+## traini_pml3<-Train_pml2[,c(-1,-2,-5,-6,-60)]
+## test_pml3<-test_pml2[,c(-1,-2,-5,-6,-60)]
+
+## train_pml_pr<-prcomp(traini_pml3,scale.=T)
+## test_pml_pr<-predict(train_pml_pr,newdata=test_pml3)
+## test_pml_pr<-as.data.frame(test_pml_pr)
+## std_dev <- train_pml_pr$sdev
+## pr_var <- std_dev^2
+## prop_varex <- pr_var/sum(pr_var)
+## plot(cumsum(prop_varex), xlab = "Principal Component",
+##      ylab = "Cumulative Proportion of Variance Explained",
+##      type = "b")
+## cumsum(prop_varex[1:33])
+
 5. I observed around 33 of the first PCAs explained more than 98% cumulative variance in the data. So I decided to with the 33 PCAs.
-6. I used Generalized Boosted Regression models and RandomForests from Caret package for prediction. 
-7. But before that I partitioned the training data set into training(70%) and Validation (30%) data sets For Cross Validation.
-8. I used different tuning parameters for RandomForest and GBM changing the number of trees.
-9. I validated my model using the validation data set and GBM with 150 trees and interaction.depth = 3 gave the best accuracy.
+6. I partitioned the training data set into training(70%) and Validation (30%) data sets For Cross Validation
+7. I used RandomForests with different tuning parameters for prediction (mtry and ntree) and cross validating them against validation data set. 
+## ingbm<-createDataPartition(train.data[,34],p=0.7)[[1]]
+## train.data2<-train.data[ingbm,]
+## val.data2<-train.data[-ingbm,]
+
+## library(randomForest)
+## ref_model<-randomForest(classe~.,data=train.data2,mtry=5,ntree=100)
+## ref_model2<-randomForest(classe~.,data=train.data2,mtry=6,ntree=120)
+## ref_model3<-randomForest(classe~.,data=train.data2,mtry=4,ntree=150)
+
+## pred_rf_val<-predict(ref_model,newdata=val.data2[,-1])
+## pred_rf_val2<-predict(ref_model2,newdata=val.data2[,-1])
+## pred_rf_val3<-predict(ref_model3,newdata=val.data2[,-1])
+## confusionMatrix(pred_rf_val,val.data2[,1])
+## confusionMatrix(pred_rf_val2,val.data2[,1])
+## confusionMatrix(pred_rf_val3,val.data2[,1])
+
+9. I validated my model using the validation data set and 100 trees and mtry = 5 gave the best accuracy (0.9771).
 10. Subsequently I used the model with the above parameters to train the entire data set.
-11. I Finally applied it to test the 20 test cases and got a accuracy of 85%.
+
+## ref_model4<-randomForest(classe~.,data=train.data,mtry=5,ntree=100)
+## rf.predict<-predict(ref_model4,newdata=test_pml_pr)
+## print(rf.predict)
+
+11. I Finally applied it to test the 20 test cases and got a accuracy of 100%.
