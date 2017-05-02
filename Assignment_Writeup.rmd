@@ -4,7 +4,7 @@ Steps for my analysis
 1. As the data had too many variables and many columns consisted of mainly NA/DIV/0 columns so I read the files by replacing all the blanks/NAs/Nan/DIV/0! by NA
 2. Next I reduced the number of columns by keeping columns which had only full rows of data and ignoring the NAs
 
- Train_pml<-read.csv("C:/DATA SCIENCE SPECIALIZATION/pml-training.csv",header = TRUE,na.strings = c("NA","NaN","","#DIV/0!"))
+ ### Train_pml<-read.csv("C:/DATA SCIENCE SPECIALIZATION/pml-training.csv",header = TRUE,na.strings = c("NA","NaN","","#DIV/0!"))
  ### test_pml<-read.csv("C:/DATA SCIENCE SPECIALIZATION/pml-testing.csv",header = TRUE,
  ###                   na.strings = c("NA","NaN","","#DIV/0!"))
  ### summary(Train_pml)
