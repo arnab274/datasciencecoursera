@@ -31,7 +31,7 @@ Steps for my analysis
 
 5. I observed around 33 of the first PCAs explained more than 98% cumulative variance in the data. So I decided to with the 33 PCAs.
 6. I partitioned the training data set into training(70%) and Validation (30%) data sets For Cross Validation
-7. I used RandomForests with different tuning parameters for prediction (mtry and ntree) and cross validating them against validation data set. 
+7. I used RandomForests with different tuning parameters for prediction (mtry and ntree) and cross validating them against validation data set. I predicted the validation set with each model and printed out the confusion matrix to estimate out of sample accuracy for each model.
  ### ingbm<-createDataPartition(train.data[,34],p=0.7)[[1]]
  ### train.data2<-train.data[ingbm,]
  ### val.data2<-train.data[-ingbm,]
