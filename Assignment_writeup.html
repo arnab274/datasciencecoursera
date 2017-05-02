@@ -1,0 +1,337 @@
+<html>
+
+<head>
+<style type="text/css">
+.knitr .inline {
+  background-color: #f7f7f7;
+  border:solid 1px #B0B0B0;
+}
+.error {
+	font-weight: bold;
+	color: #FF0000;
+}
+.warning {
+	font-weight: bold;
+}
+.message {
+	font-style: italic;
+}
+.source, .output, .warning, .error, .message {
+	padding: 0 1em;
+  border:solid 1px #F7F7F7;
+}
+.source {
+  background-color: #f5f5f5;
+}
+.rimage .left {
+  text-align: left;
+}
+.rimage .right {
+  text-align: right;
+}
+.rimage .center {
+  text-align: center;
+}
+.hl.num {
+  color: #AF0F91;
+}
+.hl.str {
+  color: #317ECC;
+}
+.hl.com {
+  color: #AD95AF;
+  font-style: italic;
+}
+.hl.opt {
+  color: #000000;
+}
+.hl.std {
+  color: #585858;
+}
+.hl.kwa {
+  color: #295F94;
+  font-weight: bold;
+}
+.hl.kwb {
+  color: #B05A65;
+}
+.hl.kwc {
+  color: #55aa55;
+}
+.hl.kwd {
+  color: #BC5A65;
+  font-weight: bold;
+}
+</style>
+<title>Title</title>
+</head>
+
+<body>
+
+<p>This is an R HTML document.</p>
+
+<div class="chunk" id="unnamed-chunk-1"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(caret)</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## Loading required package: lattice
+</pre></div>
+<div class="message"><pre class="knitr r">## Loading required package: ggplot2
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(randomForest)</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## randomForest 4.6-12
+</pre></div>
+<div class="message"><pre class="knitr r">## Type rfNews() to see new features/changes/bug fixes.
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'randomForest'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:ggplot2':
+## 
+##     margin
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">Train_pml</span><span class="hl kwb">&lt;-</span><span class="hl kwd">read.csv</span><span class="hl std">(</span><span class="hl str">&quot;C:/DATA SCIENCE SPECIALIZATION/pml-training.csv&quot;</span><span class="hl std">,</span><span class="hl kwc">header</span> <span class="hl std">=</span> <span class="hl num">TRUE</span><span class="hl std">,</span>
+                    <span class="hl kwc">na.strings</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;NA&quot;</span><span class="hl std">,</span><span class="hl str">&quot;NaN&quot;</span><span class="hl std">,</span><span class="hl str">&quot;&quot;</span><span class="hl std">,</span><span class="hl str">&quot;#DIV/0!&quot;</span><span class="hl std">))</span>
+<span class="hl std">test_pml</span><span class="hl kwb">&lt;-</span><span class="hl kwd">read.csv</span><span class="hl std">(</span><span class="hl str">&quot;C:/DATA SCIENCE SPECIALIZATION/pml-testing.csv&quot;</span><span class="hl std">,</span><span class="hl kwc">header</span> <span class="hl std">=</span> <span class="hl num">TRUE</span><span class="hl std">,</span>
+                   <span class="hl kwc">na.strings</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;NA&quot;</span><span class="hl std">,</span><span class="hl str">&quot;NaN&quot;</span><span class="hl std">,</span><span class="hl str">&quot;&quot;</span><span class="hl std">,</span><span class="hl str">&quot;#DIV/0!&quot;</span><span class="hl std">))</span>
+
+<span class="hl std">Train_pml2</span><span class="hl kwb">&lt;-</span><span class="hl std">Train_pml[,</span><span class="hl kwd">sapply</span><span class="hl std">(Train_pml,</span><span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">x</span><span class="hl std">)</span> <span class="hl opt">!</span><span class="hl kwd">any</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(x)))]</span>
+<span class="hl std">test_pml2</span><span class="hl kwb">&lt;-</span><span class="hl std">test_pml[,</span><span class="hl kwd">sapply</span><span class="hl std">(test_pml,</span><span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">x</span><span class="hl std">)</span> <span class="hl opt">!</span><span class="hl kwd">any</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(x)))]</span>
+
+
+
+
+<span class="hl std">traini_pml3</span><span class="hl kwb">&lt;-</span><span class="hl std">Train_pml2[,</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">5</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">6</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">60</span><span class="hl std">)]</span>
+<span class="hl std">test_pml3</span><span class="hl kwb">&lt;-</span><span class="hl std">test_pml2[,</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">5</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">6</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">60</span><span class="hl std">)]</span>
+
+<span class="hl std">train_pml_pr</span><span class="hl kwb">&lt;-</span><span class="hl kwd">prcomp</span><span class="hl std">(traini_pml3,</span><span class="hl kwc">scale.</span><span class="hl std">=T)</span>
+<span class="hl std">test_pml_pr</span><span class="hl kwb">&lt;-</span><span class="hl kwd">predict</span><span class="hl std">(train_pml_pr,</span><span class="hl kwc">newdata</span><span class="hl std">=test_pml3)</span>
+<span class="hl std">test_pml_pr</span><span class="hl kwb">&lt;-</span><span class="hl kwd">as.data.frame</span><span class="hl std">(test_pml_pr)</span>
+
+<span class="hl std">std_dev</span> <span class="hl kwb">&lt;-</span> <span class="hl std">train_pml_pr</span><span class="hl opt">$</span><span class="hl std">sdev</span>
+<span class="hl std">pr_var</span> <span class="hl kwb">&lt;-</span> <span class="hl std">std_dev</span><span class="hl opt">^</span><span class="hl num">2</span>
+<span class="hl std">prop_varex</span> <span class="hl kwb">&lt;-</span> <span class="hl std">pr_var</span><span class="hl opt">/</span><span class="hl kwd">sum</span><span class="hl std">(pr_var)</span>
+</pre></div>
+</div></div>
+
+<div class="chunk" id="unnamed-chunk-2"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl kwd">plot</span><span class="hl std">(</span><span class="hl kwd">cumsum</span><span class="hl std">(prop_varex),</span> <span class="hl kwc">xlab</span> <span class="hl std">=</span> <span class="hl str">&quot;Principal Component&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">ylab</span> <span class="hl std">=</span> <span class="hl str">&quot;Cumulative Proportion of Variance Explained&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;b&quot;</span><span class="hl std">)</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-2-1.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" class="plot" /></div></div>
+
+<div class="chunk" id="unnamed-chunk-3"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl kwd">cumsum</span><span class="hl std">(prop_varex[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">33</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##  [1] 0.1572845 0.3058073 0.3932681 0.4685137 0.5374154 0.5926658 0.6336052
+##  [8] 0.6716362 0.7031011 0.7311830 0.7566811 0.7804345 0.7995595 0.8178530
+## [15] 0.8354014 0.8516163 0.8665772 0.8802630 0.8925876 0.9038313 0.9134923
+## [22] 0.9223299 0.9302743 0.9374334 0.9444853 0.9507294 0.9563023 0.9616742
+## [29] 0.9663224 0.9706065 0.9743754 0.9776430 0.9807367
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">train.data</span><span class="hl kwb">&lt;-</span><span class="hl kwd">data.frame</span><span class="hl std">(</span><span class="hl kwc">classe</span><span class="hl std">=Train_pml2</span><span class="hl opt">$</span><span class="hl std">classe,train_pml_pr</span><span class="hl opt">$</span><span class="hl std">x)</span>
+<span class="hl std">train.data</span><span class="hl kwb">=</span><span class="hl std">train.data[,</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">34</span><span class="hl std">]</span>
+
+
+<span class="hl std">ingbm</span><span class="hl kwb">&lt;-</span><span class="hl kwd">createDataPartition</span><span class="hl std">(train.data[,</span><span class="hl num">34</span><span class="hl std">],</span><span class="hl kwc">p</span><span class="hl std">=</span><span class="hl num">0.7</span><span class="hl std">)[[</span><span class="hl num">1</span><span class="hl std">]]</span>
+<span class="hl std">train.data2</span><span class="hl kwb">&lt;-</span><span class="hl std">train.data[ingbm,]</span>
+<span class="hl std">val.data2</span><span class="hl kwb">&lt;-</span><span class="hl std">train.data[</span><span class="hl opt">-</span><span class="hl std">ingbm,]</span>
+
+
+<span class="hl std">ref_model</span><span class="hl kwb">&lt;-</span><span class="hl kwd">randomForest</span><span class="hl std">(classe</span><span class="hl opt">~</span><span class="hl std">.,</span><span class="hl kwc">data</span><span class="hl std">=train.data2,</span><span class="hl kwc">mtry</span><span class="hl std">=</span><span class="hl num">5</span><span class="hl std">,</span><span class="hl kwc">ntree</span><span class="hl std">=</span><span class="hl num">100</span><span class="hl std">)</span>
+<span class="hl kwd">print</span><span class="hl std">(ref_model)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## Call:
+##  randomForest(formula = classe ~ ., data = train.data2, mtry = 5,      ntree = 100) 
+##                Type of random forest: classification
+##                      Number of trees: 100
+## No. of variables tried at each split: 5
+## 
+##         OOB estimate of  error rate: 2.53%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 3860   17   10    9    4  0.01025641
+## B   48 2602   39    7    3  0.03593924
+## C    7   36 2323   21    3  0.02803347
+## D   12    4   76 2133    7  0.04435484
+## E    4    8   16   17 2472  0.01787843
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">ref_model2</span><span class="hl kwb">&lt;-</span><span class="hl kwd">randomForest</span><span class="hl std">(classe</span><span class="hl opt">~</span><span class="hl std">.,</span><span class="hl kwc">data</span><span class="hl std">=train.data2,</span><span class="hl kwc">mtry</span><span class="hl std">=</span><span class="hl num">6</span><span class="hl std">,</span><span class="hl kwc">ntree</span><span class="hl std">=</span><span class="hl num">120</span><span class="hl std">)</span>
+<span class="hl kwd">print</span><span class="hl std">(ref_model2)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## Call:
+##  randomForest(formula = classe ~ ., data = train.data2, mtry = 6,      ntree = 120) 
+##                Type of random forest: classification
+##                      Number of trees: 120
+## No. of variables tried at each split: 6
+## 
+##         OOB estimate of  error rate: 2.53%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 3863   11   10   12    4 0.009487179
+## B   46 2606   44    0    3 0.034457206
+## C    6   34 2322   25    3 0.028451883
+## D    9    2   89 2126    6 0.047491039
+## E    5    8   18   13 2473 0.017481128
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">ref_model3</span><span class="hl kwb">&lt;-</span><span class="hl kwd">randomForest</span><span class="hl std">(classe</span><span class="hl opt">~</span><span class="hl std">.,</span><span class="hl kwc">data</span><span class="hl std">=train.data2,</span><span class="hl kwc">mtry</span><span class="hl std">=</span><span class="hl num">4</span><span class="hl std">,</span><span class="hl kwc">ntree</span><span class="hl std">=</span><span class="hl num">150</span><span class="hl std">)</span>
+<span class="hl kwd">print</span><span class="hl std">(ref_model3)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## Call:
+##  randomForest(formula = classe ~ ., data = train.data2, mtry = 4,      ntree = 150) 
+##                Type of random forest: classification
+##                      Number of trees: 150
+## No. of variables tried at each split: 4
+## 
+##         OOB estimate of  error rate: 2.28%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 3863    8   12   14    3 0.009487179
+## B   41 2618   36    2    2 0.030011115
+## C    7   32 2325   24    2 0.027196653
+## D    9    3   82 2132    6 0.044802867
+## E    1    3   14   12 2487 0.011918951
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">ref_model</span><span class="hl opt">$</span><span class="hl std">inbag</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## NULL
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">pred_rf_val</span><span class="hl kwb">&lt;-</span><span class="hl kwd">predict</span><span class="hl std">(ref_model,</span><span class="hl kwc">newdata</span><span class="hl std">=val.data2[,</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">])</span>
+<span class="hl std">pred_rf_val2</span><span class="hl kwb">&lt;-</span><span class="hl kwd">predict</span><span class="hl std">(ref_model2,</span><span class="hl kwc">newdata</span><span class="hl std">=val.data2[,</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">])</span>
+<span class="hl std">pred_rf_val3</span><span class="hl kwb">&lt;-</span><span class="hl kwd">predict</span><span class="hl std">(ref_model3,</span><span class="hl kwc">newdata</span><span class="hl std">=val.data2[,</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">])</span>
+<span class="hl kwd">confusionMatrix</span><span class="hl std">(pred_rf_val,val.data2[,</span><span class="hl num">1</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1668   22    0    1    3
+##          B    1 1065    8    2    2
+##          C    5   10 1014   34    9
+##          D    5    0    9  945    3
+##          E    1    1    1    2 1073
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9798          
+##                  95% CI : (0.9758, 0.9832)
+##     No Information Rate : 0.2855          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9744          
+##  Mcnemar's Test P-Value : 1.393e-07       
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9929   0.9699   0.9826   0.9604   0.9844
+## Specificity            0.9938   0.9973   0.9880   0.9965   0.9990
+## Pos Pred Value         0.9847   0.9879   0.9459   0.9823   0.9954
+## Neg Pred Value         0.9971   0.9931   0.9963   0.9921   0.9965
+## Prevalence             0.2855   0.1866   0.1754   0.1672   0.1852
+## Detection Rate         0.2835   0.1810   0.1723   0.1606   0.1824
+## Detection Prevalence   0.2879   0.1832   0.1822   0.1635   0.1832
+## Balanced Accuracy      0.9933   0.9836   0.9853   0.9784   0.9917
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">confusionMatrix</span><span class="hl std">(pred_rf_val2,val.data2[,</span><span class="hl num">1</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1663   16    0    1    4
+##          B    3 1074    6    1    1
+##          C    7    7 1015   35    9
+##          D    6    0    9  944    6
+##          E    1    1    2    3 1070
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9799         
+##                  95% CI : (0.976, 0.9834)
+##     No Information Rate : 0.2855         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9746         
+##  Mcnemar's Test P-Value : 4.653e-06      
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9899   0.9781   0.9835   0.9593   0.9817
+## Specificity            0.9950   0.9977   0.9880   0.9957   0.9985
+## Pos Pred Value         0.9875   0.9899   0.9459   0.9782   0.9935
+## Neg Pred Value         0.9960   0.9950   0.9965   0.9919   0.9958
+## Prevalence             0.2855   0.1866   0.1754   0.1672   0.1852
+## Detection Rate         0.2826   0.1825   0.1725   0.1604   0.1818
+## Detection Prevalence   0.2862   0.1844   0.1824   0.1640   0.1830
+## Balanced Accuracy      0.9924   0.9879   0.9858   0.9775   0.9901
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">confusionMatrix</span><span class="hl std">(pred_rf_val3,val.data2[,</span><span class="hl num">1</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1668   21    0    0    4
+##          B    1 1068    6    1    1
+##          C    6    8 1015   35    7
+##          D    4    1   10  947    5
+##          E    1    0    1    1 1073
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9808         
+##                  95% CI : (0.977, 0.9841)
+##     No Information Rate : 0.2855         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9757         
+##  Mcnemar's Test P-Value : 9.942e-08      
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9929   0.9727   0.9835   0.9624   0.9844
+## Specificity            0.9941   0.9981   0.9885   0.9959   0.9994
+## Pos Pred Value         0.9852   0.9916   0.9477   0.9793   0.9972
+## Neg Pred Value         0.9971   0.9938   0.9965   0.9925   0.9965
+## Prevalence             0.2855   0.1866   0.1754   0.1672   0.1852
+## Detection Rate         0.2835   0.1815   0.1725   0.1609   0.1824
+## Detection Prevalence   0.2877   0.1830   0.1820   0.1643   0.1829
+## Balanced Accuracy      0.9935   0.9854   0.9860   0.9792   0.9919
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">ref_model4</span><span class="hl kwb">&lt;-</span><span class="hl kwd">randomForest</span><span class="hl std">(classe</span><span class="hl opt">~</span><span class="hl std">.,</span><span class="hl kwc">data</span><span class="hl std">=train.data,</span><span class="hl kwc">mtry</span><span class="hl std">=</span><span class="hl num">5</span><span class="hl std">,</span><span class="hl kwc">ntree</span><span class="hl std">=</span><span class="hl num">100</span><span class="hl std">)</span>
+
+<span class="hl kwd">print</span><span class="hl std">(ref_model4)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## Call:
+##  randomForest(formula = classe ~ ., data = train.data, mtry = 5,      ntree = 100) 
+##                Type of random forest: classification
+##                      Number of trees: 100
+## No. of variables tried at each split: 5
+## 
+##         OOB estimate of  error rate: 1.65%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 5546   13    9    9    3 0.006093190
+## B   39 3716   32    5    5 0.021332631
+## C    9   29 3357   25    2 0.018994740
+## D    9    5   92 3104    6 0.034825871
+## E    3    7   11   11 3575 0.008871638
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">rf.predictclass</span><span class="hl kwb">&lt;-</span><span class="hl kwd">predict</span><span class="hl std">(ref_model4,</span><span class="hl kwc">newdata</span><span class="hl std">=test_pml_pr[,</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">33</span><span class="hl std">])</span>
+<span class="hl kwd">print</span><span class="hl std">(rf.predictclass)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  A  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E
+</pre></div>
+</div></div>
+
+
+
+</body>
+</html>
